@@ -15,6 +15,7 @@ Contoh:
 user 10 → index 0
 user 27 → index 1
 Ini dilakukan dengan:
+
 df["user_id"] = df["user_id"].astype("category").cat.codes
 df["item_id"] = df["item_id"].astype("category").cat.codes
 
@@ -64,15 +65,21 @@ MLP menangkap interaksi nonlinear dan kompleks.
 	​
 (c) NeuMF = GMF + MLP
 Kedua bagian digabungkan:
+
 𝑜𝑢𝑡𝑝𝑢𝑡=𝑠𝑖𝑔𝑚𝑜𝑖𝑑([𝐺𝑀𝐹,𝑀𝐿𝑃]⋅ℎ)
+
 Output adalah probabilitas user menyukai item.
 
 4. Negative Sampling (Wajib untuk Implicit Feedback)
 Karena dataset implicit hanya berisi interaksi positif, kita membutuhkan contoh negatif (0).
 Negative sampling dilakukan di train.py:
+
 -Untuk tiap interaksi positif (user, item_pos)
+
 -Pilih beberapa item yang tidak pernah diinteraksi user
+
 -Labeli dengan 0
+
 Misalnya:
 (user 10, item 15) → POSITIF = 1
 (user 10, item 300) → NEGATIF = 0
@@ -81,8 +88,11 @@ Inilah sebabnya BCE berhasil digunakan.
 
 5. Training (Proses Pembelajaran)
 Model dilatih menggunakan:
+
 -Binary Cross Entropy Loss
+
 -Optimizer ADAM
+
 -Mini-batch training menggunakan DataLoader
 
 Tujuan:
@@ -90,40 +100,62 @@ Prediksi(user,item)→1 jika user suka item
 
 
 Selama training:
+
 -Positif mendorong output → 1
+
 -Negatif mendorong output → 0
+
 Loss turun seperti yang kamu lihat: Loss: 22 → 0.159 → 0.054
 
 6. Evaluasi (Top-K Recommendation Metrics)
 
 Model rekomendasi tidak diukur dengan akurasi biasa.
+
 Digunakan ranking metrics: 
+
 (a) Hit Ratio @ K
 Mengukur apakah item yang benar (ground truth) muncul dalam daftar rekomendasi top-K.
+
 𝐻𝑅@10=1jika item test masuk top 10
 
 (b) NDCG @ K
 Mengukur apakah item yang benar berada di posisi atas (ranking-aware).
+
 Jika item muncul di:
+
 -posisi #1 → skor besar
 -posisi #10 → skor kecil
-Hasil kamu: Hit Ratio@10: 0.1195
+
+Hasil kamu: 
+Hit Ratio@10: 0.1195
 NDCG@10     : 0.0531
 Ini NORMAL untuk NCF sederhana 3 epoch.
 
 7. Kesimpulan Alur Lengkap
 Berikut alur NCF dari awal sampai akhir:
+
 A.Load dataset
+
 B.Encode user_id & item_id
+
 C.Konversi ke implicit feedback (label=1)
+
 D.Buat struktur user_items
+
 E.Train-test split
+
 F.Negative sampling
+
 G.User embedding + Item embedding
+
 H.GMF block
+
 I.MLP block
+
 J.Gabungkan GMF + MLP → NeuMF
+
 K.Training dengan BCE
+
 L.Evaluasi ranking: HR@10, NDCG@10
 
 Ini digunakan untuk negative sampling dan evaluasi top-k.

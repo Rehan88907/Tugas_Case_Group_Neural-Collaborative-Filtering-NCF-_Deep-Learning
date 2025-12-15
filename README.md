@@ -6,10 +6,11 @@ Dataset yang digunakan berupa implicit feedback (user–item interaction).
 Contoh: MovieLens u.data → user_id, item_id, rating.
 
 Langkah preprocessing:
-(a) Load data
+
+(a) Load data:
 Membaca data interaksi dari CSV.
 
-(b) Mengonversi user_id dan item_id ke index numerik
+(b) Mengonversi user_id dan item_id ke index numerik:
 Embedding bekerja hanya dengan ID dalam bentuk indeks 0 → N.
 Contoh:
 user 10 → index 0
@@ -19,11 +20,11 @@ Ini dilakukan dengan:
 df["user_id"] = df["user_id"].astype("category").cat.codes
 df["item_id"] = df["item_id"].astype("category").cat.codes
 
-(c) Membentuk implicit feedback
+(c) Membentuk implicit feedback:
 Karena kita menggunakan BCE (Binary Cross Entropy), rating 1–5 harus diubah menjadi 1 (positif).
 Semua interaksi dianggap positif → label = 1.
 
-(d) Train-test split
+(d) Train-test split:
 Dataset dibagi menjadi:
 train set 80%
 test set 20%
@@ -33,12 +34,12 @@ test set 20%
 2. Pembentukan Embedding (Representasi User dan Item)
 NCF tidak menggunakan matrix factorization tradisional, tapi menggunakan neural embedding, yaitu vektor representasi user dan item.
 
-(a) User embedding
+(a) User embedding:
 Jika ada 943 user dan dimensi embedding = 16:
 Maka embedding matrix berukuran 943 × 16
 Setiap user punya vektor 16 dimensi
 
-(b) Item embedding
+(b) Item embedding:
 Jika ada 1682 item dan dimensi embedding = 16:
 Embedding = 1682 × 16
 Embedding ini dilatih bersama neural network menggunakan backpropagation.
@@ -50,27 +51,27 @@ Merepresentasikan preferensi user dan karakteristik item dalam bentuk vektor yan
 
 NCF menggabungkan dua pendekatan:
 
-(a) GMF — Generalized Matrix Factorization
+(a) GMF — Generalized Matrix Factorization:
 
 Melakukan operasi element-wise product antara embedding user dan item:
 𝑝𝑢 ⊙ 𝑞𝑖
 	​GMF menangkap interaksi linear.
 
-(b) MLP — Multi Layer Perceptron
+(b) MLP — Multi Layer Perceptron:
 
 Menggabungkan embedding user dan item dengan cara concatenate, lalu melewati beberapa dense layer berhingga nonlinear:
 
 𝑀𝐿𝑃([𝑝𝑢,𝑞𝑖])
 MLP menangkap interaksi nonlinear dan kompleks.
 	​
-(c) NeuMF = GMF + MLP
+(c) NeuMF = GMF + MLP:
 Kedua bagian digabungkan:
 
 𝑜𝑢𝑡𝑝𝑢𝑡=𝑠𝑖𝑔𝑚𝑜𝑖𝑑([𝐺𝑀𝐹,𝑀𝐿𝑃]⋅ℎ)
 
 Output adalah probabilitas user menyukai item.
 
-4. Negative Sampling (Wajib untuk Implicit Feedback)
+4. Negative Sampling (Wajib untuk Implicit Feedback):
 Karena dataset implicit hanya berisi interaksi positif, kita membutuhkan contoh negatif (0).
 Negative sampling dilakukan di train.py:
 
@@ -107,18 +108,18 @@ Selama training:
 
 Loss turun seperti yang kamu lihat: Loss: 22 → 0.159 → 0.054
 
-6. Evaluasi (Top-K Recommendation Metrics)
+6. Evaluasi (Top-K Recommendation Metrics):
 
 Model rekomendasi tidak diukur dengan akurasi biasa.
 
 Digunakan ranking metrics: 
 
-(a) Hit Ratio @ K
+(a) Hit Ratio @ K:
 Mengukur apakah item yang benar (ground truth) muncul dalam daftar rekomendasi top-K.
 
 𝐻𝑅@10=1jika item test masuk top 10
 
-(b) NDCG @ K
+(b) NDCG @ K:
 Mengukur apakah item yang benar berada di posisi atas (ranking-aware).
 
 Jika item muncul di:
